@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "declaration": true,
+    "outDir": "./lib",
+    "experimentalDecorators": true,
+    "types": ["@citizenfx/client", "@citizenfx/server"]
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "**/__tests__/*", "old_src"]
+}
