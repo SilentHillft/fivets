@@ -1,0 +1,38 @@
+import { Vector3 } from "../utils";
+import { ChangeMe } from "../change-me.type";
+import { Player } from "./player";
+export declare class Blip {
+    protected _handle: number;
+    constructor(handle: number);
+    get handle(): number;
+    get position(): Vector3;
+    setPosition(pos: Vector3): void;
+    get rotation(): number;
+    setRotation(deg: number): void;
+    setScale(val: number): void;
+    get type(): number;
+    get alpha(): number;
+    setAlpha(val: number): void;
+    setPriority(val: number): void;
+    setNumberLabel(val: number): void;
+    get color(): number;
+    setColor(color: ChangeMe): void;
+    get sprite(): number;
+    setSprite(val: ChangeMe): void;
+    setDisplay(val: number): void;
+    setName(name: string): void;
+    setNameToPlayerName(player: Player): void;
+    setShowHeadingIndicator(show: boolean): void;
+    setShowRoute(show: boolean): void;
+    setFriendly(val: boolean): void;
+    setFriend(val: boolean): void;
+    setCrew(val: boolean): void;
+    isFlashing(): boolean;
+    setFlashing(val: boolean): void;
+    isOnMinimap(): boolean;
+    isShortRange(): boolean;
+    setShortRange(val: boolean): void;
+    removeNumberLabel(): void;
+    delete(): void;
+    exists(): boolean;
+}
