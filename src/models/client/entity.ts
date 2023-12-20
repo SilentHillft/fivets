@@ -1,9 +1,9 @@
 import { Entity } from "../common";
-import {clamp, Vector3} from "../../utils";
+import { clamp, Vector3 } from "../../utils";
 import { ForceType } from "../../enums/force-type";
 import { ChangeMe } from "../../change-me.type";
 import { Vector4 } from "../../utils/vector4";
-import { TraceFlag } from "../../enums";
+import { TraceFlag, TrafficLightState } from "../../enums";
 
 export class ClientEntity extends Entity {
   public applyForceToCenterOfMass(
@@ -26,7 +26,7 @@ export class ClientEntity extends Entity {
   }
 
   public attachEntity(
-    entity: ClientEntity,
+    entity: Entity,
     boneIndex: number,
     pos: Vector3,
     rot: Vector3,
@@ -55,7 +55,7 @@ export class ClientEntity extends Entity {
   }
 
   public attachEntityPhysically(
-    entity: ClientEntity,
+    entity: Entity,
     boneIndex: number,
     boneIndex2: number,
     pos: Vector3,
@@ -133,10 +133,6 @@ export class ClientEntity extends Entity {
     return GetEntityCanBeDamaged(this.handle);
   }
 
-  public isCollisionEnabled() {
-    return !GetEntityCollisionDisabled(this.handle);
-  }
-
   public getForwardVector() {
     const [x, y, z] = GetEntityForwardVector(this.handle);
 
@@ -188,7 +184,17 @@ export class ClientEntity extends Entity {
     return GetEntityPitch(this.handle);
   }
 
-  public get proofs() {
+  public get proofs(): [
+    boolean,
+    boolean,
+    boolean,
+    boolean,
+    boolean,
+    boolean,
+    boolean,
+    boolean,
+    boolean,
+  ] {
     return GetEntityProofs(this.handle);
   }
 
@@ -244,6 +250,7 @@ export class ClientEntity extends Entity {
     return GetEntityUprightValue(this.handle);
   }
 
+  // NOTE: Seems to always return 0 for Ped
   public getLastHitMaterialHash() {
     return GetLastMaterialHitByEntity(this.handle);
   }
@@ -260,13 +267,14 @@ export class ClientEntity extends Entity {
     return HasEntityBeenDamagedByAnyVehicle(this.handle);
   }
 
-  public hasBeenDamagedByEntity(entity: ClientEntity) {
+  public hasBeenDamagedByEntity(entity: Entity) {
     return HasEntityBeenDamagedByEntity(this.handle, entity.handle, true);
   }
 
   public hasClearLosToEntity(
-    entity: ClientEntity,
-    traceFlags: TraceFlag = TraceFlag.INTERSECT_OBJECTS | TraceFlag.INTERSECT_WORLD,
+    entity: Entity,
+    traceFlags: TraceFlag = TraceFlag.INTERSECT_OBJECTS |
+      TraceFlag.INTERSECT_WORLD,
   ) {
     return HasEntityClearLosToEntity(this.handle, entity.handle, traceFlags);
   }
@@ -292,11 +300,31 @@ export class ClientEntity extends Entity {
   }
 
   public isAtPosition(pos: Vector3, size: Vector3) {
-    return IsEntityAtCoord(this.handle, pos.x, pos.y, pos.z, size.x, size.y, size.z, false, true, 0);
+    return IsEntityAtCoord(
+      this.handle,
+      pos.x,
+      pos.y,
+      pos.z,
+      size.x,
+      size.y,
+      size.z,
+      false,
+      true,
+      0,
+    );
   }
 
-  public isAtEntity(entity: ClientEntity, size: Vector3) {
-    return IsEntityAtEntity(this.handle, entity.handle, size.x, size.y, size.z, false, true, 0)
+  public isAtEntity(entity: Entity, size: Vector3) {
+    return IsEntityAtEntity(
+      this.handle,
+      entity.handle,
+      size.x,
+      size.y,
+      size.z,
+      false,
+      true,
+      0,
+    );
   }
 
   public isAttached() {
@@ -315,7 +343,7 @@ export class ClientEntity extends Entity {
     return IsEntityAttachedToAnyVehicle(this.handle);
   }
 
-  public isAttachedToEntity(entity: ClientEntity) {
+  public isAttachedToEntity(entity: Entity) {
     return IsEntityAttachedToEntity(this.handle, entity.handle);
   }
 
@@ -327,12 +355,41 @@ export class ClientEntity extends Entity {
     return IsEntityInAir(this.handle);
   }
 
-  public isInAngledArea(min: Vector3, max: Vector3, width: number, includeZ: boolean = true, debug = false) {
-    return IsEntityInAngledArea(this.handle, min.x, min.y, min.z, max.x, max.y, max.z, width, debug, includeZ, 0);
+  public isInAngledArea(
+    min: Vector3,
+    max: Vector3,
+    width: number,
+    includeZ: boolean = true,
+    debug = false,
+  ) {
+    return IsEntityInAngledArea(
+      this.handle,
+      min.x,
+      min.y,
+      min.z,
+      max.x,
+      max.y,
+      max.z,
+      width,
+      debug,
+      includeZ,
+      0,
+    );
   }
 
   public isInArea(min: Vector3, max: Vector3) {
-    return IsEntityInArea(this.handle, min.x, min.y, min.z, max.x, max.y, max.z, false, true, 0);
+    return IsEntityInArea(
+      this.handle,
+      min.x,
+      min.y,
+      min.z,
+      max.x,
+      max.y,
+      max.z,
+      false,
+      true,
+      0,
+    );
   }
 
   public isInWater() {
@@ -356,7 +413,7 @@ export class ClientEntity extends Entity {
     return IsEntityStatic(this.handle);
   }
 
-  public isTouchingEntity(entity: ClientEntity) {
+  public isTouchingEntity(entity: Entity) {
     return IsEntityTouchingEntity(this.handle, entity.handle);
   }
 
@@ -381,8 +438,25 @@ export class ClientEntity extends Entity {
   }
 
   // TODO: Implement anim* types from https://alexguirre.github.io/animations-list/
-  public playAnimation(animName: string, animDict: string, loop: boolean, stayInAnim: boolean, delta = 0, bitset = 0x4000) {
-    PlayEntityAnim(this.handle, animName, animDict, 0, loop, stayInAnim, false, delta, bitset);
+  public playAnimation(
+    animName: string,
+    animDict: string,
+    loop: boolean,
+    stayInAnim: boolean,
+    delta = 0,
+    bitset = 0x4000,
+  ) {
+    PlayEntityAnim(
+      this.handle,
+      animName,
+      animDict,
+      0,
+      loop,
+      stayInAnim,
+      false,
+      delta,
+      bitset,
+    );
   }
 
   public updateAttachments() {
@@ -413,11 +487,19 @@ export class ClientEntity extends Entity {
     SetEntityAngularVelocity(this.handle, velocity.x, velocity.y, velocity.z);
   }
 
-  public setAnimationDuration(animDict: string, animName: string, time: number) {
+  public setAnimationDuration(
+    animDict: string,
+    animName: string,
+    time: number,
+  ) {
     SetEntityAnimCurrentTime(this.handle, animDict, animName, time);
   }
 
-  public setAnimationSpeed(animDict: string, animName: string, speedMultiplier: number) {
+  public setAnimationSpeed(
+    animDict: string,
+    animName: string,
+    speedMultiplier: number,
+  ) {
     SetEntityAnimSpeed(this.handle, animDict, animName, speedMultiplier);
   }
 
@@ -450,7 +532,10 @@ export class ClientEntity extends Entity {
     SetEntityCollision(this.handle, toggle, keepPhysics);
   }
 
-  public setCompletelyDisableCollision(toggle: boolean, keepPhysics: boolean = false) {
+  public setCompletelyDisableCollision(
+    toggle: boolean,
+    keepPhysics: boolean = false,
+  ) {
     SetEntityCompletelyDisableCollision(this.handle, toggle, keepPhysics);
   }
 
@@ -478,12 +563,183 @@ export class ClientEntity extends Entity {
     SetEntityLights(this.handle, toggle);
   }
 
+  public setLoadCollisionFlag(toggle: boolean) {
+    SetEntityLoadCollisionFlag(this.handle, toggle);
+  }
+
+  public setLodDistance(distance: number) {
+    SetEntityLodDist(this.handle, distance);
+  }
+
   public setMaxHealth(maxHealth: number) {
     SetEntityMaxHealth(this.handle, maxHealth);
   }
 
+  public setMaxSpeed(speed: number) {
+    SetEntityMaxSpeed(this.handle, speed / 3.6);
+  }
+
+  public setMotionBlur(toggle: boolean) {
+    SetEntityMotionBlur(this.handle, toggle);
+  }
+
+  public disableCollisionWithEntity(
+    entity: Entity,
+    oneFrameOnly = false,
+  ) {
+    SetEntityNoCollisionEntity(this.handle, entity.handle, oneFrameOnly);
+  }
+
+  public setDamageOnlyByPlayer(toggle: boolean) {
+    SetEntityOnlyDamagedByPlayer(this.handle, toggle);
+  }
+
+  // TODO: Figure out what groupHash is
+  public setDamageOnlyByRelationshipGroup(
+    toggle: boolean,
+    groupHash: string | number,
+  ) {
+    SetEntityOnlyDamagedByRelationshipGroup(this.handle, toggle, groupHash);
+  }
+
+  public setBulletproof(toggle: boolean) {
+    const proofs = this.proofs.slice(1) as [
+      boolean,
+      boolean,
+      boolean,
+      boolean,
+      boolean,
+      boolean,
+      boolean,
+      boolean,
+    ];
+    proofs[0] = toggle;
+
+    SetEntityProofs(this.handle, ...proofs);
+  }
+
+  public setFireproof(toggle: boolean) {
+    const proofs = this.proofs.slice(1) as [
+      boolean,
+      boolean,
+      boolean,
+      boolean,
+      boolean,
+      boolean,
+      boolean,
+      boolean,
+    ];
+    proofs[1] = toggle;
+
+    SetEntityProofs(this.handle, ...proofs);
+  }
+
+  public setExplosionproof(toggle: boolean) {
+    const proofs = this.proofs.slice(1) as [
+      boolean,
+      boolean,
+      boolean,
+      boolean,
+      boolean,
+      boolean,
+      boolean,
+      boolean,
+    ];
+    proofs[2] = toggle;
+
+    SetEntityProofs(this.handle, ...proofs);
+  }
+
+  public setCollisionproof(toggle: boolean) {
+    const proofs = this.proofs.slice(1) as [
+      boolean,
+      boolean,
+      boolean,
+      boolean,
+      boolean,
+      boolean,
+      boolean,
+      boolean,
+    ];
+    proofs[3] = toggle;
+
+    SetEntityProofs(this.handle, ...proofs);
+  }
+
+  public setMeleeproof(toggle: boolean) {
+    const proofs = this.proofs.slice(1) as [
+      boolean,
+      boolean,
+      boolean,
+      boolean,
+      boolean,
+      boolean,
+      boolean,
+      boolean,
+    ];
+    proofs[4] = toggle;
+
+    SetEntityProofs(this.handle, ...proofs);
+  }
+
+  public setSteamproof(toggle: boolean) {
+    const proofs = this.proofs.slice(1) as [
+      boolean,
+      boolean,
+      boolean,
+      boolean,
+      boolean,
+      boolean,
+      boolean,
+      boolean,
+    ];
+    proofs[5] = toggle;
+
+    SetEntityProofs(this.handle, ...proofs);
+  }
+
+  public setDrownproof(toggle: boolean) {
+    const proofs = this.proofs.slice(1) as [
+      boolean,
+      boolean,
+      boolean,
+      boolean,
+      boolean,
+      boolean,
+      boolean,
+      boolean,
+    ];
+    proofs[7] = toggle;
+
+    SetEntityProofs(this.handle, ...proofs);
+  }
+
+  public setQuaternion(vector: Vector4) {
+    SetEntityQuaternion(this.handle, vector.x, vector.y, vector.z, vector.w);
+  }
+
+  public setRecordsCollisions(toggle: boolean) {
+    SetEntityRecordsCollisions(this.handle, toggle);
+  }
+
+  public renderScorched(toggle: boolean) {
+    SetEntityRenderScorched(this.handle, toggle);
+  }
+
+  public setTrafficLight(state: TrafficLightState) {
+    SetEntityTrafficlightOverride(this.handle, state);
+  }
+
+  public resetTrafficLight() {
+    this.setTrafficLight(TrafficLightState.RESET_CHANGES);
+  }
+
   public setVisible(visible: boolean) {
-    SetEntityVisible(this.handle, visible, true);
+    SetEntityVisible(this.handle, visible, false);
+  }
+
+  public wouldBeOccluded(modelHash: number, vector: Vector3, p4: boolean) {
+    return WouldEntityBeOccluded(modelHash, vector.x, vector.y, vector.z, p4);
   }
 
   public setPositionNoOffset(pos: Vector3, alive = false, ragdollFlag = false) {
@@ -495,24 +751,6 @@ export class ClientEntity extends Entity {
       alive,
       !alive,
       ragdollFlag,
-    );
-  }
-
-  public setPosition(
-    pos: Vector3,
-    alive = false,
-    ragdollFlag = false,
-    clearArea = true,
-  ) {
-    SetEntityCoords(
-      this.handle,
-      pos.x,
-      pos.y,
-      pos.z,
-      alive,
-      !alive,
-      ragdollFlag,
-      clearArea,
     );
   }
 

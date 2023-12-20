@@ -26,6 +26,12 @@ export class Game {
       return IsAnEntity(handle);
   }
 
+  public static getEntityFromStateBagName(bagName: string) {
+      const entitySrc = GetEntityFromStateBagName(bagName);
+
+      // TODO: Implement recognition of entity type and return valid model (Ped, Vehicle, etc.)
+  }
+
   public static getServerPlayers() {
       const players: ServerPlayer[] = [];
       const count = GetNumPlayerIndices();

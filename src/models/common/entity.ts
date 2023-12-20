@@ -13,6 +13,14 @@ export class Entity {
     return this._handle;
   }
 
+  public get networkId() {
+    return NetworkGetNetworkIdFromEntity(this.handle);
+  }
+
+  public get ownerHandle() {
+    return NetworkGetEntityOwner(this.handle);
+  }
+
   public exists() {
     return DoesEntityExist(this.handle);
   }
@@ -80,12 +88,42 @@ export class Entity {
     return IsEntityVisible(this.handle);
   }
 
+  public isPositionFrozen() {
+    return IsEntityPositionFrozen(this.handle);
+  }
+
   public freezePosition() {
     FreezeEntityPosition(this.handle, true);
   }
 
   public unfreezePosition() {
     FreezeEntityPosition(this.handle, false);
+  }
+
+  public setRotation(pitch: number, roll: number, yaw: number, rotationOrder: number) {
+    SetEntityRotation(this.handle, pitch, roll, yaw, rotationOrder, false);
+  }
+
+  public setPosition(
+      pos: Vector3,
+      alive = false,
+      ragdollFlag = false,
+      clearArea = true,
+  ) {
+    SetEntityCoords(
+        this.handle,
+        pos.x,
+        pos.y,
+        pos.z,
+        alive,
+        !alive,
+        ragdollFlag,
+        clearArea,
+    );
+  }
+
+  public setVelocity(vector: Vector3) {
+    SetEntityVelocity(this.handle, vector.x, vector.y, vector.z);
   }
 
   public applyForce(
@@ -113,5 +151,9 @@ export class Entity {
           false,
           true,
       );
+  }
+
+  public isCollisionEnabled() {
+    return !GetEntityCollisionDisabled(this.handle);
   }
 }

@@ -9,6 +9,8 @@ export declare class ClientPlayer {
     get handle(): number;
     get ped(): ClientPed;
     get name(): string;
+    nearestPlayer(): ClientPlayer;
+    getNearestPlayerOnTeam(team: number): ClientPlayer;
     setControl(value: boolean): void;
     setInvincible(value: boolean): void;
     unfreeze(): void;
@@ -18,4 +20,10 @@ export declare class ClientPlayer {
     clearWantedLevel(): void;
     spawn(pos: Vector3, heading: number, model?: string): Promise<void>;
     giveWeapon(weaponName: Weapon, ammo: number, isHidden?: boolean, inHand?: boolean): void;
+    get stamina(): number;
+    get maxStamina(): number;
+    setStamina(stamina: number): void;
+    setMaxStamina(stamina: number): void;
+    resetStamina(): void;
+    restoreStamina(percentage: number): void;
 }

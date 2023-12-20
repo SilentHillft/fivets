@@ -1,18 +1,32 @@
-import { EntityType } from "../../enums";
+import { EntityType, PopulationType } from "../../enums";
 import { Vector3 } from "../../utils";
 import { ForceType } from "../../enums/force-type";
 export declare class Entity {
     private _handle;
     constructor(handle: number);
     get handle(): number;
+    get networkId(): number;
+    get ownerHandle(): number;
     exists(): boolean;
     delete(): void;
     get type(): EntityType;
     get health(): number;
     get maxHealth(): number;
     get position(): Vector3;
+    get rotation(): Vector3;
+    get rotationVelocity(): Vector3;
     get heading(): number;
+    get modelHash(): number;
+    get populationType(): PopulationType;
+    get speed(): number;
+    get velocity(): Vector3;
+    isVisible(): boolean;
+    isPositionFrozen(): boolean;
     freezePosition(): void;
     unfreezePosition(): void;
+    setRotation(pitch: number, roll: number, yaw: number, rotationOrder: number): void;
+    setPosition(pos: Vector3, alive?: boolean, ragdollFlag?: boolean, clearArea?: boolean): void;
+    setVelocity(vector: Vector3): void;
     applyForce(pos: Vector3, offset: Vector3, isDirectionRelative?: boolean, isForceRelative?: boolean, forceType?: ForceType): void;
+    isCollisionEnabled(): boolean;
 }

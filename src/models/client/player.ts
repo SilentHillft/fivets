@@ -1,5 +1,5 @@
 import { ClientPed } from "./ped";
-import { sleep, Vector3 } from "../../utils";
+import {clamp, sleep, Vector3} from "../../utils";
 import { Game } from "../../game";
 import {Weapon} from "../../types/weapon";
 
@@ -164,5 +164,29 @@ export class ClientPlayer {
 
   public giveWeapon(weaponName: Weapon, ammo: number, isHidden = true, inHand = false) {
     GiveWeaponToPed(this.ped.handle, Game.generateHash(weaponName), ammo, isHidden, inHand)
+  }
+
+  public get stamina() {
+    return GetPlayerStamina(this.handle);
+  }
+
+  public get maxStamina() {
+    return GetPlayerMaxStamina(this.handle);
+  }
+
+  public setStamina(stamina: number) {
+    SetPlayerStamina(this.handle, stamina)
+  }
+
+  public setMaxStamina(stamina: number) {
+    SetPlayerMaxStamina(this.handle, stamina)
+  }
+
+  public resetStamina() {
+    ResetPlayerStamina(this.handle);
+  }
+
+  public restoreStamina(percentage: number) {
+    RestorePlayerStamina(this.handle, clamp(percentage, 0, 100));
   }
 }
